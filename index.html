@@ -80,7 +80,7 @@
 
         /* 우리엔 모달 고해상도 디자인 */
         .urien-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
-        .urien-screen { background: #f4f6fa; width: 100%; max-width: 390px; height: 85vh; border-radius: 30px; display: flex; flex-direction: column; overflow-y: auto; border: 4px solid #000; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .urien-screen { background: #f4f6fa; width: 100%; max-width: 380px; height: 85vh; border-radius: 30px; display: flex; flex-direction: column; overflow-y: auto; border: 4px solid #000; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         .urien-header { background: #007aff; color: white; padding: 22px 20px; text-align: left; }
         .urien-header .sub { font-size: 11px; opacity: 0.9; font-weight: bold; }
         .urien-header .main-title { font-size: 19px; font-weight: bold; margin-top: 5px; line-height: 1.4; }
@@ -103,8 +103,8 @@
         .urien-dot-box.active { background: #007aff; color: white; }
         .urien-dot-box.light-active { background: #f1f5f9; color: #007aff; border: 1px solid #cbd5e1; }
 
-        /* 🔄 [화려한 연출용] 실시간 API 연동 모킹 로더 스타일 */
-        .api-loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; color: white; text-align: center; font-family: sans-serif; }
+        /* API 연동 모킹 로더 */
+        .api-loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; color: white; text-align: center; }
         .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.2); border-top: 5px solid #14b8a6; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -116,6 +116,7 @@
         nav { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
         .nav-btn { background: none; border: none; cursor: pointer; text-align: center; font-size: 11px; font-weight: bold; color: #94a3b8; }
         .nav-btn.active { color: #14b8a6; }
+        .nav-btn.owner-lock.unlocked { color: #ef4444; }
     </style>
 </head>
 <body>
@@ -127,14 +128,14 @@
                 <span id="guestBadge" class="badge"><i class="fa-solid fa-eye"></i> 일반 조회 모드</span>
                 <span id="adminBadge" class="badge admin-badge"><i class="fa-solid fa-lock-open"></i> 주인 모드 활성</span>
             </div>
-            <h1 id="welcomeText">반가워요! 등록 대기 중</h1>
+            <h1 id="welcomeText">초코 보호자님, 안녕하세요!</h1>
         </header>
 
         <main>
             <div class="dashboard">
                 <div class="profile">
                     <div class="profile-icon"><i class="fa-solid fa-dog"></i></div>
-                    <div id="dashboardName" class="profile-name">미등록 (NFC 대기)</div>
+                    <div id="dashboardName" class="profile-name">초코 (푸들, 3세)</div>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-box"><div class="stat-label">⏱️ 이번 주 시간</div><div id="totalAccumulatedTime" class="stat-value">00분 00초</div></div>
@@ -145,8 +146,8 @@
             </div>
 
             <div id="guestView" class="guest-view-section">
-                <div id="guestPhone" class="phone-display">번호 미등록</div>
-                <p id="guestNotes" style="font-size:11px; color:#64748b;">하네스 태그를 통해 주인 정보를 확인하세요.</p>
+                <div id="guestPhone" class="phone-display">010-1234-5678</div>
+                <p id="guestNotes" style="font-size:11px; color:#64748b;">겁이 많고 심장 약을 주기적으로 먹어야 합니다.</p>
             </div>
 
             <div id="tabMenu" class="tab-menu" style="display: none;">
@@ -219,10 +220,14 @@
                     <div class="info-form">
                         <div class="input-group"><label>이름</label><input type="text" id="inputName" placeholder="예: 초코"></div>
                         <div class="input-group"><label>품종 / 나이</label><input type="text" id="inputBreed" placeholder="예: 푸들, 3세"></div>
-                        <div class="input-group"><label>비상 연락처</label><input type="text" id="inputPhone" placeholder="예: 010-0000-0000"></div>
-                        <div class="input-group"><label>특이사항 (유실 시 발견자 전달용)</label><textarea id="inputNotes" placeholder="예: 심장 약 복용 중, 겁이 많음"></textarea></div>
+                        <div class="input-group"><label>비상 연락처</label><input type="text" id="inputPhone" placeholder="예: 010-1234-5678"></div>
+                        <div class="input-group"><label>특이사항 (유실 시 발견자 전달용)</label><textarea id="inputNotes" placeholder="예: 겁이 많고 심장 약을 주기적으로 먹어야 합니다."></textarea></div>
                         <button type="button" class="btn-main" onclick="saveDogInfo()" style="background:#14b8a6;">정보 저장하기</button>
                     </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button type="button" onclick="resetWeekly()" style="padding:10px; font-size:11px; border:1px solid #ccc; border-radius:8px; background:white; cursor:pointer;">전체 주간 초기화</button>
+                    <button type="button" onclick="resetToday()" style="padding:10px; font-size:11px; border:1px solid #ccc; border-radius:8px; background:white; cursor:pointer;">오늘 하루 초기화</button>
                 </div>
             </div>
         </main>
@@ -297,30 +302,25 @@
         let totalSecs = 0; let todaySecs = 0; let totalKm = 0; let todayKm = 0;
         let feed = 0; let targetFeed = 2; let selectedPoopType = 'none'; let timerInterval = null;
 
+        // 🌟 앱 구동 즉시 영구보존 창고 확인 후 없으면 '초코' 데이터 기본 셋인 주입
         window.onload = function() {
+            if (!localStorage.getItem('dog_name')) {
+                localStorage.setItem('dog_name', "초코");
+                localStorage.setItem('dog_breed', "푸들, 3세");
+                localStorage.setItem('dog_phone', "010-1234-5678");
+                localStorage.setItem('dog_notes', "겁이 많고 심장 약을 주기적으로 먹어야 합니다.");
+            }
             loadSavedData();
             updateDashboard();
         };
 
-        // 🌟 [핵심 교수님 시연용] 실시간 외부 클라우드 API 비동기 매핑 연출 시스템
         function triggerUrienSync() {
             const loader = document.getElementById('apiLoader');
             const statusText = document.getElementById('loaderStatus');
-            
-            // 1단계: 통신 시작 연출
             loader.style.display = 'flex';
             statusText.innerText = "uriEn 모바일 클라우드와 통신 중...";
-
-            // 2단계: 1초 뒤 데이터 검증 단계 상태 변경 연출
-            setTimeout(() => {
-                statusText.innerText = "환자 DB 및 백신 접종 이력 동기화 중...";
-            }, 1000);
-
-            // 3단계: 2초 뒤 성공적으로 연동된 가상 팝업 표출
-            setTimeout(() => {
-                loader.style.display = 'none';
-                openUrien();
-            }, 2300);
+            setTimeout(() => { statusText.innerText = "환자 DB 및 백신 접종 이력 동기화 중..."; }, 1000);
+            setTimeout(() => { loader.style.display = 'none'; openUrien(); }, 2000);
         }
 
         function saveDogInfo() {
@@ -335,23 +335,21 @@
             localStorage.setItem('dog_notes', notes);
 
             applyDogUi(name, breed, phone, notes);
-            alert("✅ 강아지 정보가 하네스 시스템에 저장되었습니다!");
+            alert("✅ 변경된 데이터가 하네스 칩셋 브라우저에 실시간 동기화 완료되었습니다!");
             switchTab(1); 
         }
 
         function loadSavedData() {
-            const name = localStorage.getItem('dog_name') || "미등록 (NFC 대기)";
-            const breed = localStorage.getItem('dog_breed') || "";
-            const phone = localStorage.getItem('dog_phone') || "번호 미등록";
-            const notes = localStorage.getItem('dog_notes') || "하네스 태그를 통해 주인 정보를 확인하세요.";
+            const name = localStorage.getItem('dog_name') || "초코";
+            const breed = localStorage.getItem('dog_breed') || "푸들, 3세";
+            const phone = localStorage.getItem('dog_phone') || "010-1234-5678";
+            const notes = localStorage.getItem('dog_notes') || "겁이 많고 심장 약을 주기적으로 먹어야 합니다.";
 
-            if(localStorage.getItem('dog_name')) {
-                document.getElementById('inputName').value = localStorage.getItem('dog_name');
-                document.getElementById('inputBreed').value = localStorage.getItem('dog_breed');
-                document.getElementById('inputPhone').value = localStorage.getItem('dog_phone');
-                document.getElementById('inputNotes').value = localStorage.getItem('dog_notes');
-                document.getElementById('welcomeText').innerText = name + " 보호자님, 안녕하세요!";
-            }
+            document.getElementById('inputName').value = name;
+            document.getElementById('inputBreed').value = breed;
+            document.getElementById('inputPhone').value = phone;
+            document.getElementById('inputNotes').value = notes;
+            document.getElementById('welcomeText').innerText = name + " 보호자님, 안녕하세요!";
 
             applyDogUi(name, breed, phone, notes);
 
@@ -377,33 +375,24 @@
         }
 
         function toggleOwnerMode() {
-            const guestBadge = document.getElementById('guestBadge');
-            const adminBadge = document.getElementById('adminBadge');
-            const guestView = document.getElementById('guestView');
-            const tabMenu = document.getElementById('tabMenu');
-            const lockIcon = document.getElementById('lockIcon');
-            const lockText = document.getElementById('lockText');
+            const guestBadge = document.getElementById('guestBadge'); const adminBadge = document.getElementById('adminBadge');
+            const guestView = document.getElementById('guestView'); const tabMenu = document.getElementById('tabMenu');
+            const lockIcon = document.getElementById('lockIcon'); const lockText = document.getElementById('lockText');
 
             if (!isOwnerMode) {
                 if (prompt("🔒 패스워드 입력 (1234)") === "1234") {
                     isOwnerMode = true;
-                    guestBadge.style.display = "none";
-                    adminBadge.style.display = "inline-block";
-                    guestView.style.display = "none";
-                    tabMenu.style.display = "flex";
+                    guestBadge.style.display = "none"; adminBadge.style.display = "inline-block";
+                    guestView.style.display = "none"; tabMenu.style.display = "flex";
                     switchTab(1);
-                    lockIcon.className = "fa-solid fa-lock-open";
-                    lockText.innerText = "로그아웃";
+                    lockIcon.className = "fa-solid fa-lock-open"; lockText.innerText = "로그아웃";
                 }
             } else {
                 isOwnerMode = false;
-                guestBadge.style.display = "inline-block";
-                adminBadge.style.display = "none";
-                guestView.style.display = "block";
-                tabMenu.style.display = "none";
+                guestBadge.style.display = "inline-block"; adminBadge.style.display = "none";
+                guestView.style.display = "block"; tabMenu.style.display = "none";
                 for(let i=1; i<=3; i++) document.getElementById('tabContent'+i).classList.remove('active');
-                lockIcon.className = "fa-solid fa-lock";
-                lockText.innerText = "주인 인증";
+                lockIcon.className = "fa-solid fa-lock"; lockText.innerText = "주인 인증";
             }
         }
 
@@ -469,6 +458,22 @@
         
         function openUrien() { document.getElementById('urienModal').style.display = 'flex'; }
         function closeUrien() { document.getElementById('urienModal').style.display = 'none'; }
+        
+        function resetWeekly() {
+            if(confirm("⏱️ 기록을 초기화하시겠습니까?")) {
+                totalSecs = 0; totalKm = 0;
+                localStorage.setItem('totalSecs', 0); localStorage.setItem('totalKm', 0);
+                updateDashboard();
+            }
+        }
+        function resetToday() {
+            if(confirm("🐾 오늘의 측정 수치를 모두 초기화하시겠습니까?")) {
+                todaySecs = 0; todayKm = 0; feed = 0;
+                localStorage.setItem('todaySecs', 0); localStorage.setItem('todayKm', 0); localStorage.setItem('feed_count', 0); localStorage.setItem('poop_type', 'none');
+                document.getElementById('feedCountDisplay').innerText = "0 / " + targetFeed + " 회"; 
+                selectPoop('none', false); updateDashboard();
+            }
+        }
     </script>
 </body>
 </html>
