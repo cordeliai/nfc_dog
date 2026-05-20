@@ -70,7 +70,7 @@
         .target-select-box { text-align: center; font-size: 11px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: 4px; }
         .target-select { padding: 3px 6px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 11px; outline: none; margin-left: 4px; }
 
-        /* 🌟 배변 버튼 토글 그룹 및 이모티콘 디자인 복구 */
+        /* 배변 버튼 그룹 */
         .poop-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .btn-poop { padding: 10px 4px; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px; font-size: 12px; font-weight: bold; color: #64748b; cursor: pointer; text-align: center; transition: all 0.2s; }
         .btn-poop i { display: block; font-size: 18px; margin-bottom: 4px; }
@@ -78,13 +78,32 @@
         .btn-poop.active-warn { background: #fef9c3; color: #a16207; border-color: #fef08a; }
         .btn-poop.active-danger { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
 
-        /* 우리엔 모달 */
+        /* 🌟🌟🌟 [복구] 이미지와 100% 똑같은 우리엔 모달 고해상도 디자인 🌟🌟🌟 */
         .urien-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
-        .urien-screen { background: #f4f6fa; width: 100%; max-width: 380px; height: 85vh; border-radius: 30px; display: flex; flex-direction: column; overflow-y: auto; border: 4px solid #000; }
-        .urien-header { background: #007aff; color: white; padding: 20px; }
+        .urien-screen { background: #f4f6fa; width: 100%; max-width: 390px; height: 85vh; border-radius: 30px; display: flex; flex-direction: column; overflow-y: auto; border: 4px solid #000; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .urien-header { background: #007aff; color: white; padding: 22px 20px; text-align: left; }
+        .urien-header .sub { font-size: 11px; opacity: 0.9; font-weight: bold; }
+        .urien-header .main-title { font-size: 19px; font-weight: bold; margin-top: 5px; line-height: 1.4; }
+        
         .urien-body { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .urien-pass-title { font-size: 13px; color: #64748b; font-weight: bold; text-align: right; margin-bottom: 2px; }
+        
+        .urien-main-card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; position: relative; }
+        .urien-badge-group { display: flex; gap: 6px; margin-bottom: 12px; }
+        .urien-s-badge { background: #e0f2fe; color: #0369a1; font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: bold; }
+        .urien-main-card h2 { font-size: 18px; font-weight: bold; color: #1e293b; margin-bottom: 15px; }
+        .urien-info-line { font-size: 12px; color: #475569; margin-bottom: 6px; }
+        .urien-dog-thumb { position: absolute; top: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 26px; border: 2px solid #007aff; color: #007aff; }
 
-        /* 일반 조회(SOS) 뷰 */
+        .urien-sub-card { background: #1e3a8a; color: white; border-radius: 16px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .urien-sub-card.light { background: white; color: #1e293b; border: 1px solid #e2e8f0; }
+        .urien-sub-top { display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; }
+        .urien-sub-grid { display: flex; gap: 8px; margin-top: 5px; }
+        .urien-dot-box { width: 45px; height: 35px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .urien-dot-box.active { background: #007aff; color: white; }
+        .urien-dot-box.light-active { background: #f1f5f9; color: #007aff; border: 1px solid #cbd5e1; }
+
+        /* 발견자 조회(SOS) 뷰 */
         .guest-view-section { background: #fff5f5; border: 1px solid #fca5a5; padding: 15px; border-radius: 14px; text-align: center; }
         .phone-display { background: #ef4444; color: white; padding: 10px; border-radius: 10px; font-size: 18px; font-weight: bold; margin-bottom: 6px; }
 
@@ -114,10 +133,10 @@
                     <div id="dashboardName" class="profile-name">미등록 (NFC 대기)</div>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-box"><div class="stat-label">⏱️ 이번 주</div><div id="totalAccumulatedTime" class="stat-value">00분 00초</div></div>
-                    <div class="stat-box"><div class="stat-label">🛣️ 이번 주</div><div id="totalAccumulatedKm" class="stat-value">0.00 km</div></div>
-                    <div class="stat-box"><div class="stat-label">🕒 오늘</div><div id="todayTotalTime" class="stat-value">00분 00초</div></div>
-                    <div class="stat-box"><div class="stat-label">🐾 오늘</div><div id="todayTotalKm" class="stat-value">0.00 km</div></div>
+                    <div class="stat-box"><div class="stat-label">⏱️ 이번 주 시간</div><div id="totalAccumulatedTime" class="stat-value">00분 00초</div></div>
+                    <div class="stat-box"><div class="stat-label">🛣️ 이번 주 거리</div><div id="totalAccumulatedKm" class="stat-value">0.00 km</div></div>
+                    <div class="stat-box"><div class="stat-label">🕒 오늘 시간</div><div id="todayTotalTime" class="stat-value">00분 00초</div></div>
+                    <div class="stat-box"><div class="stat-label">🐾 오늘 거리</div><div id="todayTotalKm" class="stat-value">0.00 km</div></div>
                 </div>
             </div>
 
@@ -128,7 +147,7 @@
 
             <div id="tabMenu" class="tab-menu" style="display: none;">
                 <button id="tabBtn1" class="tab-btn active" onclick="switchTab(1)">산책/케어</button>
-                <button id="tabBtn2" class="tab-btn" onclick="switchTab(2)">우리엔</button>
+                <button id="tabBtn2" class="tab-btn" onclick="switchTab(2)">우리엔 수첩</button>
                 <button id="tabBtn3" class="tab-btn" onclick="switchTab(3)">정보 수정</button>
             </div>
 
@@ -180,9 +199,13 @@
             </div>
 
             <div id="tabContent2" class="tab-content">
-                <div class="card" style="text-align: center; padding: 20px;">
-                    <p style="font-size: 12px; color: #64748b; margin-bottom: 10px;">우리엔 병원 데이터를 동기화합니다.</p>
-                    <button class="btn-main" onclick="openUrien()">우리엔 진료수첩 조회</button>
+                <div class="card" style="text-align: center; padding: 25px 15px;">
+                    <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.4;">
+                        대한민국 대표 반려동물 플랫폼 <b>'우리엔'</b>의<br>실시간 모바일 진료 수첩 데이터를 하네스에 동기화합니다.
+                    </p>
+                    <button class="btn-main" style="background:#007aff;" onclick="openUrien()">
+                        <i class="fa-solid fa-shield-cat"></i> 우리엔 모바일 진료수첩 조회
+                    </button>
                 </div>
             </div>
 
@@ -214,11 +237,51 @@
 
     <div id="urienModal" class="urien-modal">
         <div class="urien-screen">
-            <div class="urien-header">우리엔 모바일 수첩</div>
+            <div class="urien-header">
+                <div class="sub">대한민국 대표 반려동물 플랫폼, 우리엔</div>
+                <div class="main-title">우리아이 건강 관리를 위한<br>모바일 진료수첩</div>
+            </div>
+            
             <div class="urien-body">
-                <div id="urienDogName" style="font-weight:bold; font-size:18px; margin-bottom:10px;">아이 정보</div>
-                <p style="font-size:12px;">예방접종 완료 (광견병 외 4종)</p>
-                <button type="button" class="btn-main" style="margin-top:20px;" onclick="closeUrien()">확인 완료</button>
+                <div class="urien-pass-title">동반출입 패스</div>
+                
+                <div class="urien-main-card">
+                    <div class="urien-badge-group">
+                        <span class="urien-s-badge" style="background:#007aff; color:white;"><i class="fa-solid fa-check"></i> 광견병 백신</span>
+                        <span class="urien-s-badge">2회차 접종</span>
+                    </div>
+                    <h2>예방접종 완료</h2>
+                    <div class="urien-info-line"><b>이름 |</b> <span id="urienTargetName">초코</span> (레오 데모 변환)</div>
+                    <div class="urien-info-line"><b>대표 병원 |</b> 우리엔 동물병원</div>
+                    <div class="urien-info-line" style="font-family:monospace;"><b>동물등록번호 |</b> 0140700A0001</div>
+                    <div class="urien-dog-thumb"><i class="fa-solid fa-dog"></i></div>
+                </div>
+
+                <div class="urien-sub-card">
+                    <div class="urien-sub-top">
+                        <span>광견병 백신 &gt;</span>
+                        <span style="font-size:11px; opacity:0.8; text-align:right;">총 2회 접종<br>최근 접종일 | 26.03.11</span>
+                    </div>
+                    <div class="urien-sub-grid">
+                        <div class="urien-dot-box active"><i class="fa-solid fa-check"></i></div>
+                        <div class="urien-dot-box active"><i class="fa-solid fa-check"></i></div>
+                        <div class="urien-dot-box"></div>
+                    </div>
+                </div>
+
+                <div class="urien-sub-card light">
+                    <div class="urien-sub-top">
+                        <span>종합백신 &gt;</span>
+                        <span style="font-size:11px; color:#64748b; text-align:right;">총 1회 접종<br>최근 접종일 | 26.01.01</span>
+                    </div>
+                    <div class="urien-sub-grid">
+                        <div class="urien-dot-box light-active"><i class="fa-solid fa-check" style="color:#007aff;"></i></div>
+                        <div class="urien-dot-box"></div>
+                        <div class="urien-dot-box"></div>
+                    </div>
+                </div>
+
+                <button class="btn-main" style="margin-top:10px; background:#007aff;" onclick="closeUrien()">확인 및 창 닫기</button>
             </div>
         </div>
     </div>
@@ -240,7 +303,9 @@
             document.getElementById('dashboardName').innerText = name + " (" + breed + ")";
             document.getElementById('guestPhone').innerText = phone;
             document.getElementById('guestNotes').innerText = notes;
-            document.getElementById('urienDogName').innerText = name + "의 진료 기록";
+            
+            // 🌟 우리엔 면액 패스 내부의 이름 데이터도 동적으로 수정 연동!
+            document.getElementById('urienTargetName').innerText = name;
 
             alert("✅ 강아지 정보가 하네스 시스템에 저장되었습니다!");
             switchTab(1); 
@@ -321,9 +386,9 @@
         }
 
         function updateDashboard() {
-            document.getElementById('totalAccumulatedTime').innerText = Math.floor(totalSecs/60) + "분";
+            document.getElementById('totalAccumulatedTime').innerText = Math.floor(totalSecs/60) + "분 " + (totalSecs % 60) + "초";
             document.getElementById('totalAccumulatedKm').innerText = totalKm.toFixed(2) + " km";
-            document.getElementById('todayTotalTime').innerText = Math.floor(todaySecs/60) + "분";
+            document.getElementById('todayTotalTime').innerText = Math.floor(todaySecs/60) + "분 " + (todaySecs % 60) + "초";
             document.getElementById('todayTotalKm').innerText = todayKm.toFixed(2) + " km";
         }
         
