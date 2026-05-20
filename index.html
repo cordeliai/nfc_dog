@@ -64,9 +64,16 @@
         /* 산책/케어 섹션 */
         .walk-section { text-align: center; padding: 10px 0; background: #f8fafc; border-radius: 14px; border: 1px dashed #cbd5e1; }
         .circle-btn { width: 90px; height: 90px; border-radius: 50%; border: 5px solid #f1f5f9; background-color: #0f172a; color: white; font-size: 12px; font-weight: bold; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
-        .feed-counter { display: flex; align-items: center; justify-content: center; gap: 15px; }
+        
+        /* 급여 및 나이 선택 */
+        .feed-counter { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 8px; }
+        .target-select-box { text-align: center; font-size: 11px; color: #64748b; border-top: 1px solid #f1f5f9; padding-top: 8px; margin-top: 4px; }
+        .target-select { padding: 3px 6px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 11px; outline: none; margin-left: 4px; }
+
+        /* 🌟 배변 버튼 토글 그룹 및 이모티콘 디자인 복구 */
         .poop-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-        .btn-poop { padding: 8px 2px; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px; font-size: 11px; font-weight: bold; color: #64748b; cursor: pointer; }
+        .btn-poop { padding: 10px 4px; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px; font-size: 12px; font-weight: bold; color: #64748b; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .btn-poop i { display: block; font-size: 18px; margin-bottom: 4px; }
         .btn-poop.active-normal { background: #dcfce7; color: #15803d; border-color: #86efac; }
         .btn-poop.active-warn { background: #fef9c3; color: #a16207; border-color: #fef08a; }
         .btn-poop.active-danger { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
@@ -138,6 +145,7 @@
                         <div id="timerKm" style="font-size: 12px; color: #14b8a6;">0.00 km</div>
                     </div>
                 </div>
+                
                 <div class="card">
                     <div class="card-title">오늘 사료 급여</div>
                     <div class="feed-counter">
@@ -145,13 +153,28 @@
                         <span id="feedCountDisplay" style="font-weight:bold; margin: 0 10px;">0 / 2 회</span>
                         <button type="button" style="width:30px; height:30px; border-radius:50%; border:1px solid #ccc; background: white; cursor:pointer;" onclick="changeFeed(1)">+</button>
                     </div>
+                    <div class="target-select-box">
+                        아이 나이별 권장 횟수 설정:
+                        <select id="targetSelect" class="target-select" onchange="updateTargetFeed();">
+                            <option value="2" selected>2회 (성견 기본)</option>
+                            <option value="3">3회 (유견/노령견)</option>
+                            <option value="4">4회 (아기 강아지)</option>
+                        </select>
+                    </div>
                 </div>
+                
                 <div class="card">
                     <div class="card-title">오늘 배변 체크</div>
                     <div class="poop-group">
-                        <button id="poopNormal" type="button" class="btn-poop" onclick="selectPoop('normal')">정상</button>
-                        <button id="poopSoft" type="button" class="btn-poop" onclick="selectPoop('soft')">설사</button>
-                        <button id="poopHard" type="button" class="btn-poop" onclick="selectPoop('hard')">변비</button>
+                        <button id="poopNormal" type="button" class="btn-poop" onclick="selectPoop('normal')">
+                            <i class="fa-solid fa-face-smile"></i>정상
+                        </button>
+                        <button id="poopSoft" type="button" class="btn-poop" onclick="selectPoop('soft')">
+                            <i class="fa-solid fa-droplet"></i>설사
+                        </button>
+                        <button id="poopHard" type="button" class="btn-poop" onclick="selectPoop('hard')">
+                            <i class="fa-solid fa-triangle-exclamation"></i>변비
+                        </button>
                     </div>
                 </div>
             </div>
@@ -203,7 +226,9 @@
     <script>
         let isOwnerMode = false; let isWalking = false;
         let totalSecs = 0; let todaySecs = 0; let totalKm = 0; let todayKm = 0;
-        let feed = 0; let timerInterval = null;
+        let feed = 0; let targetFeed = 2; let timerInterval = null;
+
+        window.onload = function() { updateDashboard(); };
 
         function saveDogInfo() {
             const name = document.getElementById('inputName').value || "이름 없음";
@@ -263,6 +288,17 @@
             }
         }
 
+        function updateTargetFeed() {
+            targetFeed = parseInt(document.getElementById('targetSelect').value);
+            document.getElementById('feedCountDisplay').innerText = feed + " / " + targetFeed + " 회";
+        }
+
+        function changeFeed(n) { 
+            feed += n; 
+            if(feed < 0) feed = 0; 
+            document.getElementById('feedCountDisplay').innerText = feed + " / " + targetFeed + " 회"; 
+        }
+        
         function handleWalk() {
             isWalking = !isWalking;
             if(isWalking) {
@@ -290,18 +326,17 @@
             document.getElementById('todayTotalTime').innerText = Math.floor(todaySecs/60) + "분";
             document.getElementById('todayTotalKm').innerText = todayKm.toFixed(2) + " km";
         }
-
-        function changeFeed(n) { feed += n; if(feed<0) feed=0; document.getElementById('feedCountDisplay').innerText = feed + " / 2 회"; }
         
         function selectPoop(t) { 
             document.getElementById('poopNormal').className = 'btn-poop' + (t==='normal'?' active-normal':'');
             document.getElementById('poopSoft').className = 'btn-poop' + (t==='soft'?' active-warn':'');
             document.getElementById('poopHard').className = 'btn-poop' + (t==='hard'?' active-danger':'');
         }
+        
         function openUrien() { document.getElementById('urienModal').style.display = 'flex'; }
         function closeUrien() { document.getElementById('urienModal').style.display = 'none'; }
         function resetWeekly() { totalSecs = 0; totalKm = 0; updateDashboard(); }
-        function resetToday() { todaySecs = 0; todayKm = 0; feed = 0; updateDashboard(); }
+        function resetToday() { todaySecs = 0; todayKm = 0; feed = 0; document.getElementById('feedCountDisplay').innerText = "0 / " + targetFeed + " 회"; selectPoop('none'); updateDashboard(); }
     </script>
 </body>
 </html>
