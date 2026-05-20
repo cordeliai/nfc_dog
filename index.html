@@ -41,7 +41,7 @@
         .stat-label { font-size: 10px; color: #64748b; font-weight: bold; }
         .stat-value { font-size: 12px; font-weight: bold; color: #0f172a; }
 
-        /* 탭 메뉴 (3개로 확장) */
+        /* 탭 메뉴 */
         .tab-menu { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; margin-bottom: 5px; }
         .tab-btn { flex: 1; padding: 8px; border: none; background: none; font-size: 12px; font-weight: bold; color: #64748b; cursor: pointer; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .tab-btn.active { background: #ffffff; color: #0f172a; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
@@ -49,23 +49,259 @@
         .tab-content { display: none; flex-direction: column; gap: 10px; }
         .tab-content.active { display: flex; }
 
-        /* 정보 수정 폼 스타일 */
+        /* 정보 수정 폼 */
         .info-form { display: flex; flex-direction: column; gap: 10px; }
         .input-group { display: flex; flex-direction: column; gap: 4px; }
         .input-group label { font-size: 12px; font-weight: bold; color: #475569; padding-left: 4px; }
         .input-group input, .input-group textarea { padding: 10px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; outline: none; }
         .input-group textarea { resize: none; height: 60px; }
 
-        /* 공통 버튼 */
+        /* 카드 및 버튼 */
         .card { background: #ffffff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 14px; }
         .card-title { font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
         .btn-main { width: 100%; padding: 12px; background-color: #007aff; color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; }
 
         /* 산책/케어 섹션 */
         .walk-section { text-align: center; padding: 10px 0; background: #f8fafc; border-radius: 14px; border: 1px dashed #cbd5e1; }
-        .circle-btn { width: 90px; height: 100px; border-radius: 50%; border: 5px solid #f1f5f9; background-color: #0f172a; color: white; font-size: 12px; font-weight: bold; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+        .circle-btn { width: 90px; height: 90px; border-radius: 50%; border: 5px solid #f1f5f9; background-color: #0f172a; color: white; font-size: 12px; font-weight: bold; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
         .feed-counter { display: flex; align-items: center; justify-content: center; gap: 15px; }
         .poop-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         .btn-poop { padding: 8px 2px; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px; font-size: 11px; font-weight: bold; color: #64748b; cursor: pointer; }
         .btn-poop.active-normal { background: #dcfce7; color: #15803d; border-color: #86efac; }
-        .btn-poop.active
+        .btn-poop.active-warn { background: #fef9c3; color: #a16207; border-color: #fef08a; }
+        .btn-poop.active-danger { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+        /* 우리엔 모달 */
+        .urien-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+        .urien-screen { background: #f4f6fa; width: 100%; max-width: 380px; height: 85vh; border-radius: 30px; display: flex; flex-direction: column; overflow-y: auto; border: 4px solid #000; }
+        .urien-header { background: #007aff; color: white; padding: 20px; }
+        .urien-body { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+
+        /* 일반 조회(SOS) 뷰 */
+        .guest-view-section { background: #fff5f5; border: 1px solid #fca5a5; padding: 15px; border-radius: 14px; text-align: center; }
+        .phone-display { background: #ef4444; color: white; padding: 10px; border-radius: 10px; font-size: 18px; font-weight: bold; margin-bottom: 6px; }
+
+        /* 하단 바 */
+        nav { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
+        .nav-btn { background: none; border: none; cursor: pointer; text-align: center; font-size: 11px; font-weight: bold; color: #94a3b8; }
+        .nav-btn.active { color: #14b8a6; }
+        .nav-btn.owner-lock.unlocked { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="header-top">
+                <span class="logo">PET-CONNECT</span>
+                <span id="guestBadge" class="badge"><i class="fa-solid fa-eye"></i> 일반 조회 모드</span>
+                <span id="adminBadge" class="badge admin-badge"><i class="fa-solid fa-lock-open"></i> 주인 모드 활성</span>
+            </div>
+            <h1 id="welcomeText">반가워요! 등록 대기 중</h1>
+        </header>
+
+        <main>
+            <div class="dashboard">
+                <div class="profile">
+                    <div class="profile-icon"><i class="fa-solid fa-dog"></i></div>
+                    <div id="dashboardName" class="profile-name">미등록 (NFC 대기)</div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box"><div class="stat-label">⏱️ 이번 주</div><div id="totalAccumulatedTime" class="stat-value">00분 00초</div></div>
+                    <div class="stat-box"><div class="stat-label">🛣️ 이번 주</div><div id="totalAccumulatedKm" class="stat-value">0.00 km</div></div>
+                    <div class="stat-box"><div class="stat-label">🕒 오늘</div><div id="todayTotalTime" class="stat-value">00분 00초</div></div>
+                    <div class="stat-box"><div class="stat-label">🐾 오늘</div><div id="todayTotalKm" class="stat-value">0.00 km</div></div>
+                </div>
+            </div>
+
+            <div id="guestView" class="guest-view-section">
+                <div id="guestPhone" class="phone-display">번호 미등록</div>
+                <p id="guestNotes" style="font-size:11px; color:#64748b;">하네스 태그를 통해 주인 정보를 확인하세요.</p>
+            </div>
+
+            <div id="tabMenu" class="tab-menu" style="display: none;">
+                <button id="tabBtn1" class="tab-btn active" onclick="switchTab(1)">산책/케어</button>
+                <button id="tabBtn2" class="tab-btn" onclick="switchTab(2)">우리엔</button>
+                <button id="tabBtn3" class="tab-btn" onclick="switchTab(3)">정보 수정</button>
+            </div>
+
+            <div id="tabContent1" class="tab-content">
+                <div class="walk-section">
+                    <button id="walkBtn" onclick="handleWalk();" type="button" style="background: none; border: none; outline: none;">
+                        <div class="circle-btn">
+                            <i id="walkIcon" class="fa-solid fa-play" style="color: #14b8a6; font-size: 20px;"></i>
+                            <span id="walkText">산책 시작</span>
+                        </div>
+                    </button>
+                    <div id="timerContainer" style="display: none; margin-top: 8px;">
+                        <div id="timer" style="font-size: 20px; font-weight: bold;">00:00:00</div>
+                        <div id="timerKm" style="font-size: 12px; color: #14b8a6;">0.00 km</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">오늘 사료 급여</div>
+                    <div class="feed-counter">
+                        <button type="button" style="width:30px; height:30px; border-radius:50%; border:1px solid #ccc; background: white; cursor:pointer;" onclick="changeFeed(-1)">-</button>
+                        <span id="feedCountDisplay" style="font-weight:bold; margin: 0 10px;">0 / 2 회</span>
+                        <button type="button" style="width:30px; height:30px; border-radius:50%; border:1px solid #ccc; background: white; cursor:pointer;" onclick="changeFeed(1)">+</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">오늘 배변 체크</div>
+                    <div class="poop-group">
+                        <button id="poopNormal" type="button" class="btn-poop" onclick="selectPoop('normal')">정상</button>
+                        <button id="poopSoft" type="button" class="btn-poop" onclick="selectPoop('soft')">설사</button>
+                        <button id="poopHard" type="button" class="btn-poop" onclick="selectPoop('hard')">변비</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabContent2" class="tab-content">
+                <div class="card" style="text-align: center; padding: 20px;">
+                    <p style="font-size: 12px; color: #64748b; margin-bottom: 10px;">우리엔 병원 데이터를 동기화합니다.</p>
+                    <button class="btn-main" onclick="openUrien()">우리엔 진료수첩 조회</button>
+                </div>
+            </div>
+
+            <div id="tabContent3" class="tab-content">
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-pen-to-square"></i> 강아지 정보 등록/수정</div>
+                    <div class="info-form">
+                        <div class="input-group"><label>이름</label><input type="text" id="inputName" placeholder="예: 초코"></div>
+                        <div class="input-group"><label>품종 / 나이</label><input type="text" id="inputBreed" placeholder="예: 푸들, 3세"></div>
+                        <div class="input-group"><label>비상 연락처</label><input type="text" id="inputPhone" placeholder="예: 010-0000-0000"></div>
+                        <div class="input-group"><label>특이사항 (유실 시 발견자 전달용)</label><textarea id="inputNotes" placeholder="예: 심장 약 복용 중, 겁이 많음"></textarea></div>
+                        <button type="button" class="btn-main" onclick="saveDogInfo()" style="background:#14b8a6;">정보 저장하기</button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button type="button" onclick="resetWeekly()" style="padding:10px; font-size:11px; border:1px solid #ccc; border-radius:8px; background:white; cursor:pointer;">이번 주 기록 리셋</button>
+                    <button type="button" onclick="resetToday()" style="padding:10px; font-size:11px; border:1px solid #ccc; border-radius:8px; background:white; cursor:pointer;">오늘 데이터 리셋</button>
+                </div>
+            </div>
+        </main>
+
+        <nav>
+            <button class="nav-btn active"><i class="fa-solid fa-house"></i>조회 홈</button>
+            <button id="lockBtn" class="nav-btn owner-lock" onclick="toggleOwnerMode();" type="button">
+                <i id="lockIcon" class="fa-solid fa-lock"></i><span id="lockText">주인 인증</span>
+            </button>
+        </nav>
+    </div>
+
+    <div id="urienModal" class="urien-modal">
+        <div class="urien-screen">
+            <div class="urien-header">우리엔 모바일 수첩</div>
+            <div class="urien-body">
+                <div id="urienDogName" style="font-weight:bold; font-size:18px; margin-bottom:10px;">아이 정보</div>
+                <p style="font-size:12px;">예방접종 완료 (광견병 외 4종)</p>
+                <button type="button" class="btn-main" style="margin-top:20px;" onclick="closeUrien()">확인 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isOwnerMode = false; let isWalking = false;
+        let totalSecs = 0; let todaySecs = 0; let totalKm = 0; let todayKm = 0;
+        let feed = 0; let timerInterval = null;
+
+        function saveDogInfo() {
+            const name = document.getElementById('inputName').value || "이름 없음";
+            const breed = document.getElementById('inputBreed').value || "미지정";
+            const phone = document.getElementById('inputPhone').value || "번호 미등록";
+            const notes = document.getElementById('inputNotes').value || "특이사항 없음";
+
+            document.getElementById('welcomeText').innerText = name + " 보호자님, 안녕하세요!";
+            document.getElementById('dashboardName').innerText = name + " (" + breed + ")";
+            document.getElementById('guestPhone').innerText = phone;
+            document.getElementById('guestNotes').innerText = notes;
+            document.getElementById('urienDogName').innerText = name + "의 진료 기록";
+
+            alert("✅ 강아지 정보가 하네스 시스템에 저장되었습니다!");
+            switchTab(1); 
+        }
+
+        function toggleOwnerMode() {
+            const guestBadge = document.getElementById('guestBadge');
+            const adminBadge = document.getElementById('adminBadge');
+            const guestView = document.getElementById('guestView');
+            const tabMenu = document.getElementById('tabMenu');
+            const lockIcon = document.getElementById('lockIcon');
+            const lockText = document.getElementById('lockText');
+
+            if (!isOwnerMode) {
+                if (prompt("🔒 패스워드 입력 (1234)") === "1234") {
+                    isOwnerMode = true;
+                    guestBadge.style.display = "none";
+                    adminBadge.style.display = "inline-block";
+                    guestView.style.display = "none";
+                    tabMenu.style.display = "flex";
+                    switchTab(1);
+                    lockIcon.className = "fa-solid fa-lock-open";
+                    lockText.innerText = "로그아웃";
+                }
+            } else {
+                isOwnerMode = false;
+                guestBadge.style.display = "inline-block";
+                adminBadge.style.display = "none";
+                guestView.style.display = "block";
+                tabMenu.style.display = "none";
+                
+                for(let i=1; i<=3; i++) {
+                    document.getElementById('tabContent'+i).classList.remove('active');
+                }
+                
+                lockIcon.className = "fa-solid fa-lock";
+                lockText.innerText = "주인 인증";
+            }
+        }
+
+        function switchTab(n) {
+            for(let i=1; i<=3; i++) {
+                document.getElementById('tabBtn'+i).classList.toggle('active', i===n);
+                document.getElementById('tabContent'+i).classList.toggle('active', i===n);
+            }
+        }
+
+        function handleWalk() {
+            isWalking = !isWalking;
+            if(isWalking) {
+                document.getElementById('walkText').innerText = "종료";
+                document.getElementById('timerContainer').style.display = "block";
+                let s = 0;
+                timerInterval = setInterval(() => {
+                    s++;
+                    document.getElementById('timer').innerText = new Date(s * 1000).toISOString().substr(11, 8);
+                    document.getElementById('timerKm').innerText = ((s * 1.1) / 1000).toFixed(2) + " km";
+                    todaySecs++; todayKm += 0.0011;
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+                document.getElementById('walkText').innerText = "산책 시작";
+                totalSecs += todaySecs; totalKm += todayKm;
+                updateDashboard();
+                document.getElementById('timerContainer').style.display = "none";
+            }
+        }
+
+        function updateDashboard() {
+            document.getElementById('totalAccumulatedTime').innerText = Math.floor(totalSecs/60) + "분";
+            document.getElementById('totalAccumulatedKm').innerText = totalKm.toFixed(2) + " km";
+            document.getElementById('todayTotalTime').innerText = Math.floor(todaySecs/60) + "분";
+            document.getElementById('todayTotalKm').innerText = todayKm.toFixed(2) + " km";
+        }
+
+        function changeFeed(n) { feed += n; if(feed<0) feed=0; document.getElementById('feedCountDisplay').innerText = feed + " / 2 회"; }
+        
+        function selectPoop(t) { 
+            document.getElementById('poopNormal').className = 'btn-poop' + (t==='normal'?' active-normal':'');
+            document.getElementById('poopSoft').className = 'btn-poop' + (t==='soft'?' active-warn':'');
+            document.getElementById('poopHard').className = 'btn-poop' + (t==='hard'?' active-danger':'');
+        }
+        function openUrien() { document.getElementById('urienModal').style.display = 'flex'; }
+        function closeUrien() { document.getElementById('urienModal').style.display = 'none'; }
+        function resetWeekly() { totalSecs = 0; totalKm = 0; updateDashboard(); }
+        function resetToday() { todaySecs = 0; todayKm = 0; feed = 0; updateDashboard(); }
+    </script>
+</body>
+</html>
