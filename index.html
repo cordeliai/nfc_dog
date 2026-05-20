@@ -78,7 +78,7 @@
         .btn-poop.active-warn { background: #fef9c3; color: #a16207; border-color: #fef08a; }
         .btn-poop.active-danger { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
 
-        /* 🌟🌟🌟 [복구] 이미지와 100% 똑같은 우리엔 모달 고해상도 디자인 🌟🌟🌟 */
+        /* 우리엔 모달 고해상도 디자인 */
         .urien-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
         .urien-screen { background: #f4f6fa; width: 100%; max-width: 390px; height: 85vh; border-radius: 30px; display: flex; flex-direction: column; overflow-y: auto; border: 4px solid #000; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         .urien-header { background: #007aff; color: white; padding: 22px 20px; text-align: left; }
@@ -103,6 +103,11 @@
         .urien-dot-box.active { background: #007aff; color: white; }
         .urien-dot-box.light-active { background: #f1f5f9; color: #007aff; border: 1px solid #cbd5e1; }
 
+        /* 🔄 [화려한 연출용] 실시간 API 연동 모킹 로더 스타일 */
+        .api-loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 200; color: white; text-align: center; font-family: sans-serif; }
+        .spinner { width: 50px; height: 50px; border: 5px solid rgba(255,255,255,0.2); border-top: 5px solid #14b8a6; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* 발견자 조회(SOS) 뷰 */
         .guest-view-section { background: #fff5f5; border: 1px solid #fca5a5; padding: 15px; border-radius: 14px; text-align: center; }
         .phone-display { background: #ef4444; color: white; padding: 10px; border-radius: 10px; font-size: 18px; font-weight: bold; margin-bottom: 6px; }
@@ -111,7 +116,6 @@
         nav { position: absolute; bottom: 0; left: 0; width: 100%; height: 65px; border-top: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-around; align-items: center; z-index: 10; }
         .nav-btn { background: none; border: none; cursor: pointer; text-align: center; font-size: 11px; font-weight: bold; color: #94a3b8; }
         .nav-btn.active { color: #14b8a6; }
-        .nav-btn.owner-lock.unlocked { color: #ef4444; }
     </style>
 </head>
 <body>
@@ -203,8 +207,8 @@
                     <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; line-height: 1.4;">
                         대한민국 대표 반려동물 플랫폼 <b>'우리엔'</b>의<br>실시간 모바일 진료 수첩 데이터를 하네스에 동기화합니다.
                     </p>
-                    <button class="btn-main" style="background:#007aff;" onclick="openUrien()">
-                        <i class="fa-solid fa-shield-cat"></i> 우리엔 모바일 진료수첩 조회
+                    <button class="btn-main" style="background:#007aff;" onclick="triggerUrienSync()">
+                        <i class="fa-solid fa-rotate"></i> 우리엔 실시간 데이터 연동하기
                     </button>
                 </div>
             </div>
@@ -220,10 +224,6 @@
                         <button type="button" class="btn-main" onclick="saveDogInfo()" style="background:#14b8a6;">정보 저장하기</button>
                     </div>
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <button type="button" onclick="resetWeekly()" style="padding:10px; font-size:11px; border:1px solid #ccc; border-radius:8px; background:white; cursor:pointer;">이번 주 기록 리셋</button>
-                    <button type="button" onclick="resetToday()" style="padding:10px; font-size:11px; border:1px solid #ccc; border-radius:8px; background:white; cursor:pointer;">오늘 데이터 리셋</button>
-                </div>
             </div>
         </main>
 
@@ -233,6 +233,12 @@
                 <i id="lockIcon" class="fa-solid fa-lock"></i><span id="lockText">주인 인증</span>
             </button>
         </nav>
+    </div>
+
+    <div id="apiLoader" class="api-loader-overlay">
+        <div class="spinner"></div>
+        <h3 id="loaderStatus" style="font-size:16px; font-weight:bold; letter-spacing:0.5px;">uriEn 모바일 클라우드와 통신 중...</h3>
+        <p style="font-size:12px; color:#94a3b8; margin-top:5px;">하네스 내 고유 칩셋 암호화 토큰 검증 중</p>
     </div>
 
     <div id="urienModal" class="urien-modal">
@@ -281,7 +287,7 @@
                     </div>
                 </div>
 
-                <button class="btn-main" style="margin-top:10px; background:#007aff;" onclick="closeUrien()">확인 및 창 닫기</button>
+                <button type="button" class="btn-main" style="margin-top:10px; background:#007aff;" onclick="closeUrien()">확인 및 창 닫기</button>
             </div>
         </div>
     </div>
@@ -289,9 +295,33 @@
     <script>
         let isOwnerMode = false; let isWalking = false;
         let totalSecs = 0; let todaySecs = 0; let totalKm = 0; let todayKm = 0;
-        let feed = 0; let targetFeed = 2; let timerInterval = null;
+        let feed = 0; let targetFeed = 2; let selectedPoopType = 'none'; let timerInterval = null;
 
-        window.onload = function() { updateDashboard(); };
+        window.onload = function() {
+            loadSavedData();
+            updateDashboard();
+        };
+
+        // 🌟 [핵심 교수님 시연용] 실시간 외부 클라우드 API 비동기 매핑 연출 시스템
+        function triggerUrienSync() {
+            const loader = document.getElementById('apiLoader');
+            const statusText = document.getElementById('loaderStatus');
+            
+            // 1단계: 통신 시작 연출
+            loader.style.display = 'flex';
+            statusText.innerText = "uriEn 모바일 클라우드와 통신 중...";
+
+            // 2단계: 1초 뒤 데이터 검증 단계 상태 변경 연출
+            setTimeout(() => {
+                statusText.innerText = "환자 DB 및 백신 접종 이력 동기화 중...";
+            }, 1000);
+
+            // 3단계: 2초 뒤 성공적으로 연동된 가상 팝업 표출
+            setTimeout(() => {
+                loader.style.display = 'none';
+                openUrien();
+            }, 2300);
+        }
 
         function saveDogInfo() {
             const name = document.getElementById('inputName').value || "이름 없음";
@@ -299,16 +329,51 @@
             const phone = document.getElementById('inputPhone').value || "번호 미등록";
             const notes = document.getElementById('inputNotes').value || "특이사항 없음";
 
-            document.getElementById('welcomeText').innerText = name + " 보호자님, 안녕하세요!";
-            document.getElementById('dashboardName').innerText = name + " (" + breed + ")";
-            document.getElementById('guestPhone').innerText = phone;
-            document.getElementById('guestNotes').innerText = notes;
-            
-            // 🌟 우리엔 면액 패스 내부의 이름 데이터도 동적으로 수정 연동!
-            document.getElementById('urienTargetName').innerText = name;
+            localStorage.setItem('dog_name', name);
+            localStorage.setItem('dog_breed', breed);
+            localStorage.setItem('dog_phone', phone);
+            localStorage.setItem('dog_notes', notes);
 
+            applyDogUi(name, breed, phone, notes);
             alert("✅ 강아지 정보가 하네스 시스템에 저장되었습니다!");
             switchTab(1); 
+        }
+
+        function loadSavedData() {
+            const name = localStorage.getItem('dog_name') || "미등록 (NFC 대기)";
+            const breed = localStorage.getItem('dog_breed') || "";
+            const phone = localStorage.getItem('dog_phone') || "번호 미등록";
+            const notes = localStorage.getItem('dog_notes') || "하네스 태그를 통해 주인 정보를 확인하세요.";
+
+            if(localStorage.getItem('dog_name')) {
+                document.getElementById('inputName').value = localStorage.getItem('dog_name');
+                document.getElementById('inputBreed').value = localStorage.getItem('dog_breed');
+                document.getElementById('inputPhone').value = localStorage.getItem('dog_phone');
+                document.getElementById('inputNotes').value = localStorage.getItem('dog_notes');
+                document.getElementById('welcomeText').innerText = name + " 보호자님, 안녕하세요!";
+            }
+
+            applyDogUi(name, breed, phone, notes);
+
+            totalSecs = parseInt(localStorage.getItem('totalSecs')) || 0;
+            todaySecs = parseInt(localStorage.getItem('todaySecs')) || 0;
+            totalKm = parseFloat(localStorage.getItem('totalKm')) || 0.0;
+            todayKm = parseFloat(localStorage.getItem('todayKm')) || 0.0;
+
+            feed = parseInt(localStorage.getItem('feed_count')) || 0;
+            targetFeed = parseInt(localStorage.getItem('target_feed')) || 2;
+            document.getElementById('targetSelect').value = targetFeed;
+            document.getElementById('feedCountDisplay').innerText = feed + " / " + targetFeed + " 회";
+
+            selectedPoopType = localStorage.getItem('poop_type') || 'none';
+            selectPoop(selectedPoopType, false);
+        }
+
+        function applyDogUi(name, breed, phone, notes) {
+            document.getElementById('dashboardName').innerText = breed ? `${name} (${breed})` : name;
+            document.getElementById('guestPhone').innerText = phone;
+            document.getElementById('guestNotes').innerText = notes;
+            document.getElementById('urienTargetName').innerText = name;
         }
 
         function toggleOwnerMode() {
@@ -336,11 +401,7 @@
                 adminBadge.style.display = "none";
                 guestView.style.display = "block";
                 tabMenu.style.display = "none";
-                
-                for(let i=1; i<=3; i++) {
-                    document.getElementById('tabContent'+i).classList.remove('active');
-                }
-                
+                for(let i=1; i<=3; i++) document.getElementById('tabContent'+i).classList.remove('active');
                 lockIcon.className = "fa-solid fa-lock";
                 lockText.innerText = "주인 인증";
             }
@@ -355,12 +416,13 @@
 
         function updateTargetFeed() {
             targetFeed = parseInt(document.getElementById('targetSelect').value);
+            localStorage.setItem('target_feed', targetFeed);
             document.getElementById('feedCountDisplay').innerText = feed + " / " + targetFeed + " 회";
         }
 
         function changeFeed(n) { 
-            feed += n; 
-            if(feed < 0) feed = 0; 
+            feed += n; if(feed < 0) feed = 0; 
+            localStorage.setItem('feed_count', feed);
             document.getElementById('feedCountDisplay').innerText = feed + " / " + targetFeed + " 회"; 
         }
         
@@ -380,6 +442,12 @@
                 clearInterval(timerInterval);
                 document.getElementById('walkText').innerText = "산책 시작";
                 totalSecs += todaySecs; totalKm += todayKm;
+                
+                localStorage.setItem('totalSecs', totalSecs);
+                localStorage.setItem('todaySecs', todaySecs);
+                localStorage.setItem('totalKm', totalKm);
+                localStorage.setItem('todayKm', todayKm);
+
                 updateDashboard();
                 document.getElementById('timerContainer').style.display = "none";
             }
@@ -392,16 +460,15 @@
             document.getElementById('todayTotalKm').innerText = todayKm.toFixed(2) + " km";
         }
         
-        function selectPoop(t) { 
+        function selectPoop(t, shouldSave = true) { 
             document.getElementById('poopNormal').className = 'btn-poop' + (t==='normal'?' active-normal':'');
             document.getElementById('poopSoft').className = 'btn-poop' + (t==='soft'?' active-warn':'');
             document.getElementById('poopHard').className = 'btn-poop' + (t==='hard'?' active-danger':'');
+            if(shouldSave) localStorage.setItem('poop_type', t);
         }
         
         function openUrien() { document.getElementById('urienModal').style.display = 'flex'; }
         function closeUrien() { document.getElementById('urienModal').style.display = 'none'; }
-        function resetWeekly() { totalSecs = 0; totalKm = 0; updateDashboard(); }
-        function resetToday() { todaySecs = 0; todayKm = 0; feed = 0; document.getElementById('feedCountDisplay').innerText = "0 / " + targetFeed + " 회"; selectPoop('none'); updateDashboard(); }
     </script>
 </body>
 </html>
