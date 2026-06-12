@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetConnect | 기기 등록</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="container fade-in">
+        <div style="font-size:40px; color:#ef4444; margin-bottom:10px;">
+            <i class="fa-solid fa-paw"></i>
+        </div>
+        <h1>반려견 스마트 태그 등록</h1>
+        <p class="subtitle">소중한 아이의 정보를 등록해 안전하게 보호하세요.</p>
+
+        <div id="message-box" class="alert-box hidden"></div>
+
+        <form id="registerForm">
+            <div class="input-group">
+                <label>제품 고유 번호 (NFC 시리얼)</label>
+                <input type="text" id="productId" class="input-field" readonly style="background-color:#f1f5f9; font-weight:bold; color:#ef4444;">
+            </div>
+
+            <div class="input-group">
+                <label>보호자 이메일 (SOS 알림 수신용)</label>
+                <input type="email" id="email" class="input-field" placeholder="예: user@example.com" required>
+            </div>
+
+            <div class="input-group">
+                <label>보호자 연락처</label>
+                <input type="tel" id="phone" class="input-field" placeholder="예: 010-1234-5678" required>
+            </div>
+
+            <div class="input-group">
+                <label>반려견 이름 및 특징 요약</label>
+                <input type="text" id="petName" class="input-field" placeholder="예: 초코 (푸들, 3세)" required>
+            </div>
+
+            <div class="input-group">
+                <label>제보자에게 보여질 당부 메시지</label>
+                <textarea id="petDesc" class="input-field" rows="3" placeholder="예: 겁이 많으니 부드럽게 대해주세요. 알러지가 있어 아무 간식이나 주면 안됩니다." required style="resize:none;"></textarea>
+            </div>
+
+            <div class="input-group">
+                <label>인증 비밀번호 (추후 정보 수정용)</label>
+                <input type="password" id="password" class="input-field" placeholder="4자리 이상 숫자" required>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                <i class="fa-solid fa-check"></i> 정보 등록 완료하기
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // 구글 앱스 스크립트 배포 후 생성된 URL을 아래에 입력하세요.
+        // index.html과 동일한 URL이어야 합니다.
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw6n6yYfjl-XmmtfQTzbZuoYNISw5Run0rVU8K2gwabM-v_0D5e99VcQE3fftP9sar68A/exec";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const tagId = urlParams.get('id');
+        
+        if(tagId) {
+            document.getElementById('productId').value = tagId;
+        } else {
+            alert("유효하지 않은 접근입니다. 제품의 NFC를 다시 태그해주세요.");
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const msgBox = document.getElementById('message-box');
+            
+            if(WEB_APP_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+                msgBox.className = "alert-box alert-error";
+                msgBox.innerText = "웹 앱 URL이 설정되지 않았습니다.";
+                msgBox.classList.remove('hidden');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 등록 중...';
+
+            const payload = {
+                action: 'register',
+                id: document.getElementById('productId').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                petName: document.getElementById('petName').value,
+                petDesc: document.getElementById('petDesc').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                // GAS 웹 앱은 CORS 이슈 때문에 보통 POST 요청 시 no-cors 모드를 쓰거나, 
+                // form-urlencoded 방식으로 보내는 것이 안전합니다.
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    msgBox.className = "alert-box alert-success";
+                    msgBox.innerHTML = `성공적으로 등록되었습니다! 이제 안심하셔도 됩니다.<br><br>
+                    <button type="button" class="btn" onclick="window.location.href='index.html?id=${document.getElementById('productId').value}'" style="background:#1e293b; padding:10px; font-size:14px;">
+                        👀 발견자 화면(SOS) 테스트 해보기
+                    </button>`;
+                    msgBox.classList.remove('hidden');
+                    // 성공 시 폼 가리기
+                    document.getElementById('registerForm').style.display = 'none';
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                msgBox.className = "alert-box alert-error";
+                msgBox.innerText = "오류가 발생했습니다: " + error.message;
+                msgBox.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> 정보 등록 완료하기';
+            }
+        });
+    </script>
+</body>
+</html>

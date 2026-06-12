@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetConnect SOS | 접속 중...</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // 구글 앱스 스크립트 배포 후 생성된 URL을 아래에 입력하세요.
+        // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw6n6yYfjl-XmmtfQTzbZuoYNISw5Run0rVU8K2gwabM-v_0D5e99VcQE3fftP9sar68A/exec";
+        
+        async function checkStatus() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tagId = urlParams.get('id');
+
+            if (!tagId) {
+                showError("유효하지 않은 접근입니다. NFC 태그를 다시 인식해주세요.");
+                return;
+            }
+
+            try {
+                // 테스트를 위한 임시 방어 코드 (URL이 입력되지 않았을 때)
+                if(WEB_APP_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
+                    showError("앱스 스크립트 웹 앱 URL이 설정되지 않았습니다. 코드를 수정해주세요.");
+                    return;
+                }
+
+                // 구글 시트(GAS)에 기기 상태 확인 요청
+                const response = await fetch(`${WEB_APP_URL}?action=check&id=${tagId}`);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    if (data.data.isRegistered === 'Y') {
+                        // 등록된 기기이므로 유실견 신고 페이지로 이동
+                        window.location.href = `find.html?id=${tagId}&name=${encodeURIComponent(data.data.petName)}&desc=${encodeURIComponent(data.data.petDesc)}`;
+                    } else if (data.data.isRegistered === 'N') {
+                        // 미등록 기기이므로 가입 페이지로 이동
+                        window.location.href = `register.html?id=${tagId}`;
+                    } else {
+                        showError("기기 상태를 확인할 수 없습니다.");
+                    }
+                } else {
+                    showError("서버 오류: " + data.message);
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showError("통신 중 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
+            }
+        }
+
+        function showError(msg) {
+            document.getElementById("loading").classList.add("hidden");
+            const errorBox = document.getElementById("error-box");
+            errorBox.classList.remove("hidden");
+            errorBox.innerText = msg;
+        }
+
+        window.onload = checkStatus;
+    </script>
+</head>
+<body>
+    <div class="container fade-in">
+        <div id="loading">
+            <h1 style="font-size:20px;">디바이스 정보 확인 중</h1>
+            <p class="subtitle">잠시만 기다려주세요...</p>
+            <div class="spinner"></div>
+        </div>
+        
+        <div id="error-box" class="alert-box alert-error hidden"></div>
+    </div>
+</body>
+</html>
