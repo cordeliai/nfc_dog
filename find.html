@@ -8,28 +8,95 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <div class="container fade-in">
-        <div class="alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
-        <h1>반려견을 발견하셨나요?</h1>
-        <p class="subtitle">아래 버튼을 누르면 보호자에게 현재 위치와 연락처가 전송되어 소중한 생명을 구할 수 있습니다.</p>
+    <div class="container app-container fade-in">
+        <!-- 발견자(SOS) 모드 뷰 -->
+        <div id="viewFinder" class="content-view active">
+            <div class="alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h1>반려견을 발견하셨나요?</h1>
+            <p class="subtitle">아래 버튼을 누르면 보호자에게 현재 위치와 연락처가 전송되어 소중한 생명을 구할 수 있습니다.</p>
 
-        <div class="pet-info">
-            <div class="name"><i class="fa-solid fa-dog"></i> <span id="displayPetName">아이 이름 로딩중...</span></div>
-            <div class="desc" id="displayPetDesc">보호자의 당부 메시지 로딩중...</div>
+            <div class="pet-info">
+                <div class="name"><i class="fa-solid fa-dog"></i> <span id="displayPetName">아이 이름 로딩중...</span></div>
+                <div class="desc" id="displayPetDesc">보호자의 당부 메시지 로딩중...</div>
+            </div>
+
+            <div id="message-box" class="alert-box hidden"></div>
+
+            <div class="input-group">
+                <input type="tel" id="finderPhone" class="input-field" placeholder="제보자님의 연락처 (숫자만 입력)" style="text-align:center; font-size:18px;">
+            </div>
+
+            <button type="button" class="btn" id="sosBtn" onclick="sendSosSignal()">
+                🚨 현재 위치 보호자에게 전송
+            </button>
+            <p style="font-size: 12px; color: #94a3b8; margin-top: 15px;">
+                <i class="fa-solid fa-location-crosshairs"></i> 버튼을 누르면 GPS 위치 정보를 수집합니다.
+            </p>
         </div>
 
-        <div id="message-box" class="alert-box hidden"></div>
+        <!-- 보호자 로그인 뷰 -->
+        <div id="viewOwnerAuth" class="content-view">
+            <div class="alert-icon" style="color: #64748b; font-size: 40px;"><i class="fa-solid fa-lock"></i></div>
+            <h1 style="color: #0f172a;">보호자 인증</h1>
+            <p class="subtitle">정보를 수정하려면 가입 시 설정한 비밀번호를 입력해 주세요.</p>
+            
+            <div id="auth-message-box" class="alert-box hidden"></div>
 
-        <div class="input-group">
-            <input type="tel" id="finderPhone" class="input-field" placeholder="제보자님의 연락처 (숫자만 입력)" style="text-align:center; font-size:18px;">
+            <div class="input-group">
+                <input type="password" id="authPassword" class="input-field" placeholder="비밀번호 입력" style="text-align:center; letter-spacing: 5px; font-size: 20px;">
+            </div>
+
+            <button type="button" class="btn" id="authBtn" onclick="authOwner()" style="background-color: #0f172a;">
+                🔓 인증하기
+            </button>
         </div>
 
-        <button type="button" class="btn" id="sosBtn" onclick="sendSosSignal()">
-            🚨 현재 위치 보호자에게 전송
-        </button>
-        <p style="font-size: 12px; color: #94a3b8; margin-top: 15px;">
-            <i class="fa-solid fa-location-crosshairs"></i> 버튼을 누르면 GPS 위치 정보를 수집합니다.
-        </p>
+        <!-- 보호자 정보 수정 뷰 -->
+        <div id="viewOwnerEdit" class="content-view">
+            <div class="owner-card">
+                <div class="owner-title"><i class="fa-solid fa-user-gear"></i> 보호자 정보 수정</div>
+                <p style="font-size: 12px; color: #475569;">실시간으로 DB의 정보를 업데이트합니다.</p>
+            </div>
+            
+            <div id="edit-message-box" class="alert-box hidden"></div>
+
+            <div class="input-group">
+                <label>보호자 이메일</label>
+                <input type="email" id="editEmail" class="input-field">
+            </div>
+            <div class="input-group">
+                <label>보호자 연락처</label>
+                <input type="tel" id="editPhone" class="input-field">
+            </div>
+            <div class="input-group">
+                <label>반려견 이름 및 특징 요약</label>
+                <input type="text" id="editPetName" class="input-field">
+            </div>
+            <div class="input-group">
+                <label>제보자에게 보여질 당부 메시지</label>
+                <textarea id="editPetDesc" class="input-field" rows="3" style="resize:none;"></textarea>
+            </div>
+            <div class="input-group">
+                <label>비밀번호 변경 (변경할 때만 입력)</label>
+                <input type="password" id="editPassword" class="input-field" placeholder="새로운 비밀번호">
+            </div>
+
+            <button type="button" class="btn" id="saveBtn" onclick="updateOwnerInfo()" style="background-color: #10b981; margin-bottom: 20px;">
+                💾 수정 완료하기
+            </button>
+        </div>
+
+        <!-- 하단 네비게이션 바 -->
+        <nav>
+            <button class="nav-btn active" id="navFinder" onclick="switchView('viewFinder')">
+                <i class="fa-solid fa-house"></i>
+                발견자 홈
+            </button>
+            <button class="nav-btn" id="navOwner" onclick="switchView('viewOwnerAuth')">
+                <i class="fa-solid fa-user-shield"></i>
+                주인 모드
+            </button>
+        </nav>
     </div>
 
     <script>
@@ -43,9 +110,32 @@
         const petName = urlParams.get('name') || "알 수 없음";
         const petDesc = urlParams.get('desc') || "";
 
+        let currentPassword = ""; // 인증 완료 후 수정 요청 시 사용할 기존 비밀번호
+
         document.getElementById('displayPetName').innerText = petName;
         document.getElementById('displayPetDesc').innerText = `"${petDesc}"`;
 
+        // 뷰 전환 로직
+        function switchView(viewId) {
+            // 모든 뷰 가리기
+            document.querySelectorAll('.content-view').forEach(view => view.classList.remove('active'));
+            // 모든 네비 버튼 비활성화
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // 만약 이미 로그인 된 상태에서 주인 모드를 누르면 뷰를 Edit 화면으로 넘김
+            if (viewId === 'viewOwnerAuth' && currentPassword !== "") {
+                viewId = 'viewOwnerEdit';
+                document.getElementById('navOwner').classList.add('active');
+            } else if (viewId === 'viewFinder') {
+                document.getElementById('navFinder').classList.add('active');
+            } else if (viewId === 'viewOwnerAuth') {
+                document.getElementById('navOwner').classList.add('active');
+            }
+
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        // [발견자 기능] SOS 전송
         async function sendSosSignal() {
             const finderPhone = document.getElementById('finderPhone').value;
             const btn = document.getElementById('sosBtn');
@@ -57,15 +147,9 @@
                 return;
             }
 
-            if(WEB_APP_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-                alert("웹 앱 URL이 설정되지 않았습니다.");
-                return;
-            }
-
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 위치 정보 확인 및 전송 중...';
 
-            // GPS 위치 가져오기
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     position => {
@@ -75,49 +159,120 @@
                     },
                     error => {
                         console.warn("위치 정보를 가져올 수 없습니다.", error);
-                        // 위치 수집 거부/실패 시에도 연락처만이라도 전송
                         sendToServer(null, null, finderPhone, btn, msgBox);
                     },
                     { enableHighAccuracy: true, timeout: 5000 }
                 );
             } else {
-                // GPS 지원 안하는 기기
                 sendToServer(null, null, finderPhone, btn, msgBox);
             }
         }
 
         async function sendToServer(lat, lng, finderPhone, btn, msgBox) {
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'sos', id: tagId, finderPhone: finderPhone, lat: lat, lng: lng })
+                });
+                const result = await response.json();
+                if(result.status === 'success') {
+                    msgBox.className = "alert-box alert-success";
+                    msgBox.innerText = "성공적으로 보호자에게 알림이 전송되었습니다. 아이 곁을 잠시만 지켜주세요. 감사합니다!";
+                    msgBox.classList.remove('hidden');
+                    btn.style.display = 'none';
+                } else { throw new Error(result.message); }
+            } catch (error) {
+                msgBox.className = "alert-box alert-error";
+                msgBox.innerText = "전송 실패: " + error.message;
+                msgBox.classList.remove('hidden');
+                btn.disabled = false;
+                btn.innerHTML = '🚨 현재 위치 보호자에게 전송';
+            }
+        }
+
+        // [주인 기능] 비밀번호 인증
+        async function authOwner() {
+            const password = document.getElementById('authPassword').value;
+            const btn = document.getElementById('authBtn');
+            const msgBox = document.getElementById('auth-message-box');
+
+            if(!password) { alert("비밀번호를 입력해주세요."); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 확인 중...';
+
+            try {
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'auth_owner', id: tagId, password: password })
+                });
+                const result = await response.json();
+                
+                if(result.status === 'success') {
+                    currentPassword = password; // 인증 성공 시 비번 저장
+                    
+                    // 폼에 기존 정보 채우기
+                    document.getElementById('editEmail').value = result.data.email;
+                    document.getElementById('editPhone').value = result.data.phone;
+                    document.getElementById('editPetName').value = result.data.petName;
+                    document.getElementById('editPetDesc').value = result.data.petDesc;
+                    
+                    // 수정 화면으로 전환
+                    switchView('viewOwnerEdit');
+                } else { throw new Error(result.message); }
+            } catch (error) {
+                msgBox.className = "alert-box alert-error";
+                msgBox.innerText = "인증 실패: " + error.message;
+                msgBox.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔓 인증하기';
+            }
+        }
+
+        // [주인 기능] 정보 수정 완료
+        async function updateOwnerInfo() {
+            const btn = document.getElementById('saveBtn');
+            const msgBox = document.getElementById('edit-message-box');
+            
             const payload = {
-                action: 'sos',
+                action: 'update_owner',
                 id: tagId,
-                finderPhone: finderPhone,
-                lat: lat,
-                lng: lng
+                password: currentPassword, // 보안 검증용 기존 비번
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                petName: document.getElementById('editPetName').value,
+                petDesc: document.getElementById('editPetDesc').value,
+                newPassword: document.getElementById('editPassword').value
             };
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 저장 중...';
 
             try {
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
-                
                 const result = await response.json();
                 
                 if(result.status === 'success') {
-                    msgBox.className = "alert-box alert-success";
-                    msgBox.innerText = "성공적으로 보호자에게 알림이 전송되었습니다. 아이 곁을 잠시만 지켜주세요. 감사합니다!";
-                    msgBox.classList.remove('hidden');
-                    btn.style.display = 'none';
-                } else {
-                    throw new Error(result.message);
-                }
+                    if (payload.newPassword) currentPassword = payload.newPassword;
+                    
+                    // 성공 메시지 띄우기 및 발견자 홈 뷰 업데이트
+                    document.getElementById('displayPetName').innerText = payload.petName;
+                    document.getElementById('displayPetDesc').innerText = `"${payload.petDesc}"`;
+                    
+                    alert("성공적으로 정보가 업데이트되었습니다!");
+                    switchView('viewFinder');
+                } else { throw new Error(result.message); }
             } catch (error) {
-                console.error(error);
                 msgBox.className = "alert-box alert-error";
-                msgBox.innerText = "전송 실패: " + error.message;
+                msgBox.innerText = "수정 실패: " + error.message;
                 msgBox.classList.remove('hidden');
+            } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🚨 현재 위치 보호자에게 전송';
+                btn.innerHTML = '💾 수정 완료하기';
             }
         }
     </script>

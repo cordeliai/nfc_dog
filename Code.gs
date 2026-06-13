@@ -53,6 +53,10 @@ function doPost(e) {
     return handleRegister(params);
   } else if (action === 'sos') {
     return handleSOS(params);
+  } else if (action === 'auth_owner') {
+    return handleAuthOwner(params);
+  } else if (action === 'update_owner') {
+    return handleUpdateOwner(params);
   }
 
   return createJsonResponse({ status: 'error', message: 'Unknown POST action' });
@@ -214,6 +218,80 @@ function handleSOS(params) {
   }
 
   return createJsonResponse({ status: 'error', message: 'Device not found or not registered' });
+}
+
+// 4. 보호자 인증 (비밀번호 확인)
+function handleAuthOwner(params) {
+  const { id, password } = params;
+  
+  if(!id || !password) {
+    return createJsonResponse({ status: 'error', message: 'Missing credentials' });
+  }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === id && data[i][1] === 'Y') {
+      const savedPassword = data[i][6]; // G열: 비밀번호
+      
+      // 비밀번호가 일치하는지 확인 (숫자/문자 타입 차이 방지를 위해 string 변환 후 비교)
+      if (String(savedPassword) === String(password)) {
+        return createJsonResponse({ 
+          status: 'success', 
+          message: 'Authenticated',
+          data: {
+            email: data[i][2],
+            phone: data[i][3],
+            petName: data[i][4],
+            petDesc: data[i][5]
+          }
+        });
+      } else {
+        return createJsonResponse({ status: 'error', message: '비밀번호가 일치하지 않습니다.' });
+      }
+    }
+  }
+
+  return createJsonResponse({ status: 'error', message: '등록된 기기를 찾을 수 없습니다.' });
+}
+
+// 5. 보호자 정보 업데이트
+function handleUpdateOwner(params) {
+  const { id, password, email, phone, petName, petDesc, newPassword } = params;
+  
+  if(!id || !password || !email || !phone || !petName) {
+    return createJsonResponse({ status: 'error', message: 'Missing required fields for update' });
+  }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === id && data[i][1] === 'Y') {
+      const savedPassword = data[i][6];
+      
+      if (String(savedPassword) === String(password)) {
+        const rowIndex = i + 1;
+        
+        sheet.getRange(rowIndex, 3).setValue(email);
+        sheet.getRange(rowIndex, 4).setValue(phone);
+        sheet.getRange(rowIndex, 5).setValue(petName);
+        sheet.getRange(rowIndex, 6).setValue(petDesc);
+        
+        // 새 비밀번호가 입력되었다면 업데이트
+        if (newPassword && newPassword.trim() !== '') {
+          sheet.getRange(rowIndex, 7).setValue(newPassword);
+        }
+        
+        return createJsonResponse({ status: 'success', message: '성공적으로 정보가 수정되었습니다.' });
+      } else {
+        return createJsonResponse({ status: 'error', message: '비밀번호가 일치하지 않습니다.' });
+      }
+    }
+  }
+
+  return createJsonResponse({ status: 'error', message: '등록된 기기를 찾을 수 없습니다.' });
 }
 
 // JSON 응답을 만들어주는 헬퍼 함수
