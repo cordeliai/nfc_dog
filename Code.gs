@@ -153,23 +153,59 @@ function handleSOS(params) {
       const ownerEmail = data[i][2];
       const petName = data[i][4];
       
-      // 이메일 내용 구성
       const subject = `🚨 [PetConnect SOS] '${petName}'(을)를 보호 중인 제보자가 있습니다!`;
       
-      let body = `보호자님, 누군가 반려동물 '${petName}'(을)를 발견하고 SOS 신호를 보냈습니다!\n\n`;
-      body += `📞 제보자 연락처: ${finderPhone}\n`;
+      // HTML 이메일 본문 작성
+      let htmlBody = `
+        <div style="font-family: 'Malgun Gothic', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #f8fafc;">
+          <h2 style="color: #ef4444; margin-top: 0;">🚨 반려동물 발견 긴급 알림</h2>
+          <p style="font-size: 16px; color: #1e293b; line-height: 1.5;">
+            보호자님, 누군가 반려동물 <strong>'${petName}'</strong>(을)를 발견하고 SOS 신호를 보냈습니다!
+          </p>
+          
+          <div style="background-color: #ffffff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #cbd5e1;">
+            <p style="margin: 0 0 10px 0; font-size: 16px;">
+              📞 <strong>제보자 연락처:</strong> 
+              <a href="tel:${finderPhone}" style="color: #2563eb; font-weight: bold; font-size: 18px; text-decoration: underline;">
+                ${finderPhone}
+              </a>
+              <span style="font-size: 12px; color: #64748b;">(클릭 시 바로 전화 연결)</span>
+            </p>
+      `;
       
       if (lat && lng) {
-        body += `📍 발견 위치 (구글 지도): https://www.google.com/maps?q=${lat},${lng}\n\n`;
+        htmlBody += `
+            <p style="margin: 15px 0 5px 0; font-size: 16px;">📍 <strong>발견 위치 지도 보기:</strong></p>
+            <p style="margin: 0;">
+              <a href="https://map.naver.com/v5/?c=${lng},${lat},15,0,0,0,dh" style="display: inline-block; background: #03c75a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">
+                🟢 네이버 지도로 보기
+              </a>
+              <a href="https://www.google.com/maps?q=${lat},${lng}" style="display: inline-block; background: #4285f4; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                🔵 구글 지도로 보기
+              </a>
+            </p>
+          </div>
+        `;
       } else {
-        body += `📍 발견 위치: 제보자 기기에서 GPS 수집이 거부되어 위치를 알 수 없습니다. 제보자에게 전화로 문의해주세요.\n\n`;
+        htmlBody += `
+            <p style="margin: 15px 0 0 0; color: #ef4444; font-size: 14px;">
+              📍 발견 위치: 제보자 기기에서 GPS 정보 제공을 동의하지 않아 위치를 알 수 없습니다. 제보자에게 전화로 문의해주세요.
+            </p>
+          </div>
+        `;
       }
       
-      body += `최대한 빨리 제보자에게 연락해 보시기 바랍니다.\n- PetConnect SOS 시스템`;
+      htmlBody += `
+          <p style="font-size: 14px; color: #64748b; margin-top: 20px;">
+            최대한 빨리 제보자에게 연락해 보시기 바랍니다.<br>
+            <strong>- PetConnect SOS 시스템 올림</strong>
+          </p>
+        </div>
+      `;
 
-      // 구글 메일(Gmail) 앱을 통해 무료 이메일 전송
       try {
-        GmailApp.sendEmail(ownerEmail, subject, body);
+        // htmlBody 옵션을 추가하여 HTML 포맷으로 전송
+        GmailApp.sendEmail(ownerEmail, subject, "", { htmlBody: htmlBody });
         return createJsonResponse({ status: 'success', message: 'SOS signal sent' });
       } catch (err) {
         return createJsonResponse({ status: 'error', message: 'Failed to send email: ' + err.toString() });

@@ -28,8 +28,8 @@
                     return;
                 }
 
-                // 구글 시트(GAS)에 기기 상태 확인 요청
-                const response = await fetch(`${WEB_APP_URL}?action=check&id=${tagId}`);
+                // 구글 시트(GAS)에 기기 상태 확인 요청 (브라우저 캐싱 방지를 위해 시간값 추가)
+                const response = await fetch(`${WEB_APP_URL}?action=check&id=${tagId}&t=${new Date().getTime()}`);
                 const data = await response.json();
 
                 if (data.status === 'success') {
