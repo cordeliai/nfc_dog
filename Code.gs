@@ -181,7 +181,7 @@ function handleSOS(params) {
         htmlBody += `
             <p style="margin: 15px 0 5px 0; font-size: 16px;">📍 <strong>발견 위치 지도 보기:</strong></p>
             <p style="margin: 0;">
-              <a href="https://map.naver.com/v5/?c=${lng},${lat},15,0,0,0,dh" style="display: inline-block; background: #03c75a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">
+              <a href="https://map.naver.com/p/search/${lat},${lng}" style="display: inline-block; background: #03c75a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">
                 🟢 네이버 지도로 보기
               </a>
               <a href="https://www.google.com/maps?q=${lat},${lng}" style="display: inline-block; background: #4285f4; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold;">
