@@ -178,8 +178,22 @@ function handleSOS(params) {
       `;
       
       if (lat && lng) {
+        let addressText = "상세 주소를 불러올 수 없습니다. (지도 링크를 확인해주세요)";
+        try {
+          const geoResponse = Maps.newGeocoder().setLanguage('ko').reverseGeocode(lat, lng);
+          if (geoResponse.status === 'OK' && geoResponse.results.length > 0) {
+            // "대한민국" 이라는 단어가 항상 앞에 붙으므로 제거해서 깔끔하게 표시
+            addressText = geoResponse.results[0].formatted_address.replace("대한민국 ", "");
+          }
+        } catch(e) {
+          console.error("Geocoding error:", e);
+        }
+
         htmlBody += `
-            <p style="margin: 15px 0 5px 0; font-size: 16px;">📍 <strong>발견 위치 지도 보기:</strong></p>
+            <p style="margin: 15px 0 5px 0; font-size: 16px;">📍 <strong>발견 위치 (주소):</strong><br>
+              <span style="font-size: 18px; color: #1e293b; font-weight: bold;">${addressText}</span>
+            </p>
+            <p style="margin: 15px 0 5px 0; font-size: 16px;">🗺️ <strong>지도 앱으로 보기:</strong></p>
             <p style="margin: 0;">
               <a href="https://map.naver.com/p/search/${lat},${lng}" style="display: inline-block; background: #03c75a; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-right: 10px;">
                 🟢 네이버 지도로 보기
