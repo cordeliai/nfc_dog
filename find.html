@@ -23,7 +23,7 @@
             <div id="message-box" class="alert-box hidden"></div>
 
             <div class="input-group">
-                <input type="tel" id="finderPhone" class="input-field" placeholder="제보자님의 연락처 (숫자만 입력)" style="text-align:center; font-size:18px;" autocomplete="off">
+                <input type="text" inputmode="numeric" pattern="[0-9]*" id="finderPhone" class="input-field" placeholder="제보자님의 연락처 (숫자만 입력)" style="text-align:center; font-size:18px;" autocomplete="new-password">
             </div>
 
             <button type="button" class="btn" id="sosBtn" onclick="sendSosSignal()">
