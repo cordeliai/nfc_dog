@@ -99,7 +99,10 @@
                 // GAS 웹 앱은 CORS 이슈 때문에 보통 POST 요청 시 no-cors 모드를 쓰거나, 
                 // form-urlencoded 방식으로 보내는 것이 안전합니다.
                 const response = await fetch(WEB_APP_URL, {
-                    method: 'POST',
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8",
+                    },
                     body: JSON.stringify(payload)
                 });
                 
