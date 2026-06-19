@@ -168,9 +168,9 @@ function handleSOS(params) {
           </p>
           
           <div style="background-color: #ffffff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #cbd5e1;">
-            <p style="margin: 0 0 10px 0; font-size: 16px;">
+            <p style="margin: 0 0 10px 0; font-size: 16px; color: #1e293b;">
               📞 <strong>제보자 연락처:</strong> 
-              <a href="tel:${finderPhone}" style="color: #2563eb; font-weight: bold; font-size: 18px; text-decoration: underline;">
+              <a href="tel:${finderPhone}" style="color: #2563eb !important; font-weight: bold; font-size: 18px; text-decoration: underline !important;">
                 ${finderPhone}
               </a>
               <span style="font-size: 12px; color: #64748b;">(클릭 시 바로 전화 연결)</span>
@@ -190,15 +190,19 @@ function handleSOS(params) {
         }
 
         htmlBody += `
-            <p style="margin: 15px 0 5px 0; font-size: 16px;">📍 <strong>발견 위치 (주소):</strong><br>
-              <span style="font-size: 18px; color: #1e293b; font-weight: bold;">${addressText}</span>
+            <p style="margin: 15px 0 5px 0; font-size: 16px; color: #1e293b;">📍 <strong>발견 위치 (주소):</strong><br>
+              <span style="font-size: 18px; color: #0f172a; font-weight: bold;">${addressText}</span>
             </p>
-            <p style="margin: 15px 0 5px 0; font-size: 16px;">🗺️ <strong>지도 앱으로 보기:</strong></p>
-            <p style="margin: 0;">
-              <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" style="display: inline-block; background: #4285f4; color: white; padding: 10px 15px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-                🔵 구글 지도로 보기
-              </a>
-            </p>
+            <p style="margin: 15px 0 10px 0; font-size: 16px; color: #1e293b;">🗺️ <strong>지도 앱으로 보기:</strong></p>
+            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td>
+                  <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" style="display: inline-block; background-color: #4285f4 !important; color: #ffffff !important; padding: 12px 20px; text-decoration: none !important; border-radius: 6px; font-weight: bold; text-align: center; border: 1px solid #3367d6;">
+                    🗺️ 구글 지도로 위치 확인하기
+                  </a>
+                </td>
+              </tr>
+            </table>
           </div>
         `;
       } else {
