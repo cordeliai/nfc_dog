@@ -66,8 +66,22 @@
         
         if(tagId) {
             document.getElementById('productId').value = tagId;
+            checkIfAlreadyRegistered(tagId);
         } else {
             alert("유효하지 않은 접근입니다. 제품의 NFC를 다시 태그해주세요.");
+        }
+
+        async function checkIfAlreadyRegistered(id) {
+            try {
+                const response = await fetch(`${WEB_APP_URL}?action=check&id=${id}&t=${new Date().getTime()}`);
+                const data = await response.json();
+                if (data.status === 'success' && data.data.isRegistered === 'Y') {
+                    // 이미 등록된 기기라면 발견자(SOS) 모드로 강제 리다이렉트
+                    window.location.href = `find.html?id=${id}&name=${encodeURIComponent(data.data.petName)}&desc=${encodeURIComponent(data.data.petDesc)}`;
+                }
+            } catch (error) {
+                console.error("기기 상태 확인 실패", error);
+            }
         }
 
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
